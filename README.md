@@ -5,6 +5,6 @@ Les données des joueurs ont été scrapper sur le site  [basketball reference](
 
 ## User Guide
 Pour utiliser le DashBoard sur votre machine, vous devez tout d'abord vous assurer d'avoir correctement installer Git. Pour installer les packages nécessaire à la bonne excecution du code, entrer la commande suivante dans un terminal:
-'''
+``` 
 $python -m pip install -r requirements.txt
-'''
+```
