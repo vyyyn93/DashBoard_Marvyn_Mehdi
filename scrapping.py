@@ -27,5 +27,3 @@ toNumeric = ['G', 'GS', 'MP', 'FG', 'FGA', '3P', '3PA', '2P', '2PA', 'FT', 'FTA'
 for i in toNumeric:
         df[i] = pd.to_numeric(df[i], errors = 'coerce')
 
-fig = px.scatter(df, x="PTS", y="G")
-fig.show()
