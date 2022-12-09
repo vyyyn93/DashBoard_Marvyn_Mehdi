@@ -1,14 +1,8 @@
 import requests
 from bs4 import BeautifulSoup as bs
 import pandas as pd 
-import plotly.express as px
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Output, Input
 from geopy.geocoders import Nominatim
-import json
-
+import folium
 
 def create_soup(url):
     """
@@ -54,43 +48,48 @@ def stat_to_integer(df):
     
     return df
 
+def create_dico_coord():
+    dicoTeamStade = {"BRK":"Barclays Center", "BOS":"TD Garden", 
+            "DAL":"American Airlines Center", "OKC":"Paycom Center", 
+            "PHO": "Footprint Center", "GSW": "Chase Center",
+            "CLE":"Rocket Mortgage Fieldhouse", "MIL":"Fiserv Forum", 
+            "ATL":"State Farm Arena", "CHI":"United Center",
+            "LAL":"Crypto.com Arena", "MIN":"Target Center",
+            "POR":"Moda Center", "NYK":"Madison Square Garden",
+            "HOU":"Toyota Center", "DET":"Little Caesars Arena",
+            "WAS":"Capital One Arena","DEN":"Ball Arena",
+            "CHO":"Charlotte", "PHI":"Wells Fargo Center", 
+            "MIA":"FTX Arena", "SAC":"Golden 1 Center", 
+            "ORL":"Amway Center", "MEM":"Memphis", 
+            "TOR":"Toronto", "SAS":"San Antonio", 
+            "NOP":"New Orlean", "IND":"Indianapolis", 
+            "LAC":"Los Angeles", 'UTA':"Vivint Arena"}
+
+    loc = Nominatim(user_agent="GetLoc")
+
+    dicoTeamCoord = {}
+    for team in dicoTeamStade.keys():
+        getLocTeam = loc.geocode(dicoTeamStade[team])
+        dicoTeamCoord[team]= [getLocTeam.latitude , getLocTeam.longitude]
+    
+    return dicoTeamCoord
+
 url = "https://www.basketball-reference.com/leagues/NBA_2023_totals.html#totals_stats::pts"
 soup = create_soup(url)
 df = create_dataFrame(soup)
 df = stat_to_integer(df)
 df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
+df = df.sort_values(by="PPG", ascending=False)
+dicoTeamCoord = create_dico_coord()
 
+coordsCenter = [41.7370229, -99.5873816]
+map = folium.Map(location=coordsCenter, tiles='OpenStreetMap', zoom_start=4.3)
 
-
-"""
-if __name__ == '__main__':
+for joueur in df[0:21].itertuples():
+    folium.Marker(location=dicoTeamCoord[joueur.Tm], popup = joueur.Player).add_to(map)
     
-    app = dash.Dash(__name__) 
+map.save(outfile='map.html')  
 
-    fig2 = px.histogram(df, 
-                        x="PPG", nbins=25, 
-                        labels={'PPG':'Points Per Game'},
-                        opacity=0.7,
-                        text_auto= True)
-      
-    app.layout = html.Div(children=[
-                            html.H1(id = 'Title', 
-                                    children=f'DashBoard NBA',
-                                    style={'textAlign': 'center', 'color': '#000000'}),
-                            
-                            dcc.Graph(
-                                id='graph1',
-                                figure=fig2),
-                                
-                            html.Div(id='Count Player',
-                                     children = 'Histogramme du nombre de point par match des ' + str(len(df)) + 
-                                     ' joueur NBA',
-                                     style={'textAlign': 'center', 'color': '#000000'}),
-                            
-                            html.Iframe(id='map', srcDoc=open("map.html", 'r').read(),
-                                        width='100%', height=400)]
-    )
+ 
+ 
 
-    app.run_server(debug=True) # (8)
-
-"""
