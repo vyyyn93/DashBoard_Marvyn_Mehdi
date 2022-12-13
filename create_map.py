@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd 
 from geopy.geocoders import Nominatim
 import folium
+import webbrowser
+import branca
 
 def create_soup(url):
     """
@@ -82,13 +84,27 @@ df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
 df = df.sort_values(by="PPG", ascending=False)
 dicoTeamCoord = create_dico_coord()
 
+
 coordsCenter = [41.7370229, -99.5873816]
 map = folium.Map(location=coordsCenter, tiles='OpenStreetMap', zoom_start=4.3)
-
-for joueur in df[0:21].itertuples():
-    folium.Marker(location=dicoTeamCoord[joueur.Tm], popup = joueur.Player).add_to(map)
+i=0
+for joueur in df[0:10].itertuples():
+    i+=1
+    label = folium.Html("<p>" +str(i)+ ". " +joueur.Player + "<br />" +
+                        str(joueur.PPG)[0:4] + " PPG <br/></p>",
+                        script=True)
+    pop = folium.Popup(label, max_width=500)
+    folium.CircleMarker(location=dicoTeamCoord[joueur.Tm], 
+                        popup = pop,
+                        radius=joueur.PPG/2, 
+                        color='red',
+                        fill=True,
+                        fill_color='red',
+                        fill_opacity=0.6).add_to(map),
+                        
     
-map.save(outfile='map.html')  
+map.save(outfile='map.html')
+webbrowser.open('map.html') 
 
  
  

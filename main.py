@@ -59,38 +59,72 @@ soup = create_soup(url)
 df = create_dataFrame(soup)
 df = stat_to_integer(df)
 df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
+df["APG"] = df["AST"]/df["G"]
 
-
-
-"""
 if __name__ == '__main__':
     
     app = dash.Dash(__name__) 
-
-    fig2 = px.histogram(df, 
+    template = 'plotly_dark'
+    histoPPG = px.histogram(df, 
                         x="PPG", nbins=25, 
                         labels={'PPG':'Points Per Game'},
                         opacity=0.7,
-                        text_auto= True)
-      
-    app.layout = html.Div(children=[
-                            html.H1(id = 'Title', 
-                                    children=f'DashBoard NBA',
-                                    style={'textAlign': 'center', 'color': '#000000'}),
-                            
-                            dcc.Graph(
-                                id='graph1',
-                                figure=fig2),
-                                
-                            html.Div(id='Count Player',
-                                     children = 'Histogramme du nombre de point par match des ' + str(len(df)) + 
-                                     ' joueur NBA',
-                                     style={'textAlign': 'center', 'color': '#000000'}),
-                            
-                            html.Iframe(id='map', srcDoc=open("map.html", 'r').read(),
-                                        width='100%', height=400)]
-    )
+                        text_auto= True, template=template)
+
+    histoAPG = px.histogram(df, 
+                        x="APG", nbins=18, 
+                        labels={'APG':'Assists Per Game'},
+                        opacity=0.7,
+                        text_auto= True,
+                        template=template)
+    
+    colors = {
+        'background': '#111111',
+        'text': '#7FDBFF'
+    }
+
+    app.layout = html.Div(
+                        [html.H1(id = 'Title', 
+                                        children='DashBoard NBA',
+                                        style={'textAlign': 'center', 'color': colors['text']}),
+                        dcc.Tabs([
+                            dcc.Tab(label='Histogamme', style={'backgroundColor':colors['background'], 'color':colors['text']},
+                                children=[
+                                    html.H3(style={'textAlign': 'center', 'marginTop': '40px', 'color':colors['text']},
+                                            id='title histo'),
+                                    dcc.Graph(
+                                        id='graph1', style={'marginTop':'10px'}),
+
+                                    dcc.RadioItems(options={'PPG':'Points Per Game', 'APG':'Assists Per Game'},
+                                            value = 'PPG', inline=True, id='radioButton', style={'color':colors['text']})
+                                ]
+                            ),
+
+                            dcc.Tab(label='Map', style={'backgroundColor':colors['background'], 'color':colors['text']}, 
+                                    children=[
+                                        html.H3('Carte des 10 meillleur scoreurs NBA', 
+                                            style={'textAlign': 'center', 'color':colors['text']}),
+
+                                        html.Iframe(id='map', 
+                                            srcDoc=open("map.html", 'r', encoding='UTF8').read(),
+                                            width='80%', height=400,
+                                            style={'textAlign': 'center', 'marginTop': '40px', }
+                                            )]
+                            )]
+                        )
+                    ], style={'backgroundColor':colors['background'], 'background-image':colors['background']})
+
+    @app.callback([Output(component_id='graph1', component_property='figure'),
+                    Output(component_id='title histo', component_property='children')],
+                  [Input(component_id= 'radioButton', component_property='value')])
+    
+    def update_histo(value):
+        if value == 'PPG':
+            return [histoPPG, 'Histogramme du nombre de point par match des ' 
+                                        + str(len(df)) + ' joueur NBA']
+        
+        if value == 'APG':
+            return [histoAPG,  'Histogramme du nombre d\'assists par match des ' 
+                                        + str(len(df)) + ' joueur NBA']
 
     app.run_server(debug=True) # (8)
-
-"""
