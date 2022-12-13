@@ -21,7 +21,15 @@ Pour lancer le scrapping des données et créer le DashBoard, excecutez cette co
 ```
 $ python main.py
 ```
-Vous pouvez consultez le DashBoard [ici]](http://127.0.0.1:8050/) 
+Vous pouvez consultez le DashBoard [ici](http://127.0.0.1:8050/) 
 ## Rapport d'analyse
-
+```mermaid
+graph TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[fa:fa-car Car]
+```
+  
 ## Developper Guide
