@@ -52,6 +52,15 @@ def stat_to_integer(df):
     return df
 
 def create_dico_coord():
+    """
+    Crée un dictionnaire des stades des équpes avec les coordonnées GPS associées
+    
+    Args:
+        None
+    
+    Returns:
+        dicoTeamCoord: dictionnaire des stades et leurs coordonnées GPS"""
+        
     dicoTeamStade = {"BRK":"Barclays Center", "BOS":"TD Garden", 
             "DAL":"American Airlines Center", "OKC":"Paycom Center", 
             "PHO": "Footprint Center", "GSW": "Chase Center",

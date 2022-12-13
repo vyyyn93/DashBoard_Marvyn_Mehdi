@@ -17,11 +17,11 @@ $ cd Votre_Repertoire_De_Travail
 $ git clone adresse_publique_de_votre_projet
 ```
 
-Pour lancer le scrapping des données et ouvrir le DashBoard dans le navigateur, entre la commande suivante dans un terminal:
+Pour lancer le scrapping des données et créer le DashBoard, excecutez cette commande dans le terminal.
 ```
 $ python main.py
 ```
-
+Vous pouvez consultez le DashBoard [ici]](http://127.0.0.1:8050/) 
 ## Rapport d'analyse
 
 ## Developper Guide

@@ -1,126 +1,136 @@
-import requests
 from bs4 import BeautifulSoup as bs
-import pandas as pd 
+import requests
+import pandas as pd
 import plotly.express as px
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, Input
-from geopy.geocoders import Nominatim
-import json
+import webbrowser
 
 # Fonctions
-def create_soup(url):
-    """
-    Crée une soup à partir de l'url en paramètre au format BeautifulSoup
-    """
-    response = requests.get(url, timeout=20)
-    soup = bs(response.content, 'lxml')
-    return soup
-
-def create_dataFrame(soup):
+def create_dataframe(url_site):
     """
     Créer une DataFrame des statistiques des joueurs NBA.
+
+    Args:
+        url: url du site à scraper
+
+    Returns:
+        dataframe=DataFrame des statistiques des joueurs NBA
     """
+    response = requests.get(url_site, timeout=20)
+    soup = bs(response.content, 'lxml')
     headers = soup.find('thead') # Headers du tableau de statistique
     html_data = soup.find("tbody") # Données à parser sur les joueurs
 
     ## Récupère les 30 noms de chaques colonnes du tableau de statistique
     list_headers = []
-    for th in headers.find_all('th'):
-        list_headers.append(th.text)
+    for th_balise in headers.find_all('th'):
+        list_headers.append(th_balise.text)
 
-
-    df = pd.DataFrame(columns = list_headers)
+    dataframe = pd.DataFrame(columns = list_headers)
 
     # Récupère le texte de chaque ligne du tableau (ligne de stat) et l'ajoute dans la dataframe
-    list_ligne_stat = html_data.find_all('tr', class_="full_table") 
-    for tr in list_ligne_stat:
-        list_data_player = tr.find_all(['th', 'td'])
-        list_stat = [td.text for td in list_data_player] # Liste des stats 
-        length = len(df)
-        df.loc[length] = list_stat # Ajouter la liste à la DataFrame à l'index 'length'
-    
-    
-    return df
+    list_ligne_stat = html_data.find_all('tr', class_="full_table")
+    for tr_balise in list_ligne_stat:
+        list_data_player = tr_balise.find_all(['th', 'td'])
+        list_stat = [td_balise.text for td_balise in list_data_player] # Liste des stats
+        df_length = len(dataframe)
+        dataframe.loc[df_length] = list_stat # Ajouter la liste à la DataFrame à l'index 'length'
 
-def stat_to_integer(df):
+    return dataframe
+
+def stat_to_integer(dataframe):
     """
-    Convertis les statistiques numérique en nombre
+    Convertis les statistiques numérique de la dataFrame en integer.
+
+    Args:
+        df: DataFrame à convertir.
+
+    Return:
+        df: DataFrame convertis.
     """
-    list_stat = df.columns.tolist()[5::] # Mets sous forme de list les statistiques à convertir (les 25 dernières)
+    # Mets sous forme de list les statistiques à convertir (les 25 dernières)
+    list_stat = df.columns.tolist()[5::]
     for i in list_stat:
-        df[i] = pd.to_numeric(df[i])
-    
+        dataframe[i] = pd.to_numeric(df[i])
+
     return df
 #############################
 
-#Scraping du site et réation de la dataFrame
-url = "https://www.basketball-reference.com/leagues/NBA_2023_totals.html#totals_stats::pts"
-soup = create_soup(url)
-df = create_dataFrame(soup)
-df = stat_to_integer(df)
-df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
-df["APG"] = df["AST"]/df["G"]
-###########################################
-
 if __name__ == '__main__':
+    #Scraping du site et création de la dataFrame
+    URL = "https://www.basketball-reference.com/leagues/NBA_2023_totals.html#totals_stats::pts"
+    df = create_dataframe(URL)
+    df = stat_to_integer(df)
+    df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
+    df["APG"] = df["AST"]/df["G"]
+    ###########################################
+
     # Définition des styles du DashBoard
     colors = {
         'background': '#111111',
         'text': '#7FDBFF'
     }
     H1_style = {
-        'textAlign': 'center', 
+        'textAlign': 'center',
         'color': colors['text'],
         'marginTop':'20px'
     }
     H3_style = {
-        'textAlign': 'center', 
+        'textAlign': 'center',
         'color': colors['text'],
         'marginTop':'30px'
     }
     radio_button_style = {
-        'color':colors['text'], 
+        'color':colors['text'],
         'marginBottom':'50px'
     }
     tab_style={
-        'backgroundColor':colors['background'], 
+        'backgroundColor':colors['background'],
         'color':colors['text']
         }
-    template = 'plotly_dark'
+    map_style={
+        'marginBottom':'30px'
+    }
+    TEMPLATE = 'plotly_dark'
     ####################################
 
     # Création des graphiques Plotly
-    histoPPG = px.histogram(df, 
-                        x="PPG", nbins=25, 
-                        labels={'PPG':'Points Per Game'},
-                        opacity=0.7,
-                        text_auto= True, template=template)
+    histoPPG = px.histogram(
+        df,
+        x="PPG", nbins=25,
+        labels={'PPG':'Points Per Game'},
+        opacity=0.7,
+        text_auto= True, template=TEMPLATE
+    )
 
-    histoAPG = px.histogram(df, 
-                        x="APG", nbins=18, 
-                        labels={'APG':'Assists Per Game'},
-                        opacity=0.7,
-                        text_auto= True,
-                        template=template)
+    histoAPG = px.histogram(
+        df,
+        x="APG", nbins=18,
+        labels={'APG':'Assists Per Game'},
+        opacity=0.7,
+        text_auto= True,
+        template=TEMPLATE
+    )
     ####################################
 
     #Création du DashBoard
-    app = dash.Dash(__name__) 
+    app = dash.Dash(__name__)
 
     app.layout = html.Div(
                     style={'backgroundColor':colors['background']},
                     children = [
-                        html.Br(), 
+                        html.Br(),
                         html.H1(
-                            id = 'Title', 
+                            id = 'Title',
                             children='DashBoard NBA',
                             style=H1_style),
                         dcc.Tabs(
                             children=[
                                 dcc.Tab(
-                                    label='Histogamme', 
+                                    label='Histogamme',
                                     style=tab_style,
                                     children=[
                                         html.H3(
@@ -129,30 +139,33 @@ if __name__ == '__main__':
                                             ),
                                         dcc.Graph(id='graph1'),
                                         dcc.RadioItems(
-                                            options={'PPG':'Points Per Game', 'APG':'Assists Per Game'},
-                                            value = 'PPG', 
-                                            inline=True, 
-                                            id='radioButton', 
+                                            options={
+                                                'PPG':'Points Per Game',
+                                                'APG':'Assists Per Game'
+                                            },
+                                            value = 'PPG',
+                                            inline=True,
+                                            id='radioButton',
                                             style=radio_button_style
                                         )
                                     ]
                                 ),
                                 dcc.Tab(
-                                    label='Map', 
-                                    style=tab_style, 
+                                    label='Map',
+                                    style=tab_style,
                                     children=[
                                         html.H3(
-                                            children='Carte des 10 meillleur scoreurs NBA', 
+                                            children='Carte des 10 meillleur scoreurs NBA',
                                             style=H3_style
                                         ),
                                         html.Div(
                                             style={'text-align':'center'},
                                             children=[
                                                 html.Iframe(
-                                                    id='map', 
+                                                    id='map',
                                                     srcDoc=open("map.html", 'r', encoding='UTF8').read(),
-                                                    width='80%', height=400,
-                                                    style={'textAlign': 'center', 'marginTop': '40px','marginBottom': '80px' }
+                                                    width='70%', height=500,
+                                                    style=map_style
                                                 )
                                             ]
                                         )
@@ -169,12 +182,19 @@ if __name__ == '__main__':
                     Output(component_id='title histo', component_property='children')],
                   [Input(component_id= 'radioButton', component_property='value')])
     def update_histo(value):
+        """
+        Mets à jour l'histogramme en fonction du choix sur le radioButton
+
+        Args:
+            value: Valeurs du radioButton
+
+        Returns:
+            Histogramme à afficher et son titre"""
         if value == 'PPG':
-            return [histoPPG, 'Histogramme du nombre de point par match des ' 
+            return [histoPPG, 'Histogramme du nombre de point par match des '
                                         + str(len(df)) + ' joueur NBA']
-        
-        if value == 'APG':
-            return [histoAPG,  'Histogramme du nombre d\'assists par match des ' 
+
+        return [histoAPG,  'Histogramme du nombre d\'assists par match des '
                                         + str(len(df)) + ' joueur NBA']
     ####################################
 
