@@ -6,6 +6,7 @@ import folium
 import webbrowser
 import branca
 
+#Fonctions
 def create_soup(url):
     """
     Crée une soup à partir de l'url en paramètre au format BeautifulSoup
@@ -75,7 +76,9 @@ def create_dico_coord():
         dicoTeamCoord[team]= [getLocTeam.latitude , getLocTeam.longitude]
     
     return dicoTeamCoord
+#############################
 
+#DataFrame
 url = "https://www.basketball-reference.com/leagues/NBA_2023_totals.html#totals_stats::pts"
 soup = create_soup(url)
 df = create_dataFrame(soup)
@@ -83,25 +86,32 @@ df = stat_to_integer(df)
 df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
 df = df.sort_values(by="PPG", ascending=False)
 dicoTeamCoord = create_dico_coord()
+##############################
 
-
+#Création de la map
 coordsCenter = [41.7370229, -99.5873816]
 map = folium.Map(location=coordsCenter, tiles='OpenStreetMap', zoom_start=4.3)
+###################
+
+#Ajout des marker sur la map
 i=0
 for joueur in df[0:10].itertuples():
     i+=1
+
     label = folium.Html("<p>" +str(i)+ ". " +joueur.Player + "<br />" +
                         str(joueur.PPG)[0:4] + " PPG <br/></p>",
                         script=True)
     pop = folium.Popup(label, max_width=500)
+
     folium.CircleMarker(location=dicoTeamCoord[joueur.Tm], 
                         popup = pop,
                         radius=joueur.PPG/2, 
                         color='red',
                         fill=True,
                         fill_color='red',
-                        fill_opacity=0.6).add_to(map),
-                        
+                        fill_opacity=0.6
+        ).add_to(map),
+############################                      
     
 map.save(outfile='map.html')
 webbrowser.open('map.html') 

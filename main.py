@@ -9,7 +9,7 @@ from dash.dependencies import Output, Input
 from geopy.geocoders import Nominatim
 import json
 
-
+# Fonctions
 def create_soup(url):
     """
     Crée une soup à partir de l'url en paramètre au format BeautifulSoup
@@ -53,18 +53,45 @@ def stat_to_integer(df):
         df[i] = pd.to_numeric(df[i])
     
     return df
+#############################
 
+#Scraping du site et réation de la dataFrame
 url = "https://www.basketball-reference.com/leagues/NBA_2023_totals.html#totals_stats::pts"
 soup = create_soup(url)
 df = create_dataFrame(soup)
 df = stat_to_integer(df)
 df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
 df["APG"] = df["AST"]/df["G"]
+###########################################
 
 if __name__ == '__main__':
-    
-    app = dash.Dash(__name__) 
+    # Définition des styles du DashBoard
+    colors = {
+        'background': '#111111',
+        'text': '#7FDBFF'
+    }
+    H1_style = {
+        'textAlign': 'center', 
+        'color': colors['text'],
+        'marginTop':'20px'
+    }
+    H3_style = {
+        'textAlign': 'center', 
+        'color': colors['text'],
+        'marginTop':'30px'
+    }
+    radio_button_style = {
+        'color':colors['text'], 
+        'marginBottom':'50px'
+    }
+    tab_style={
+        'backgroundColor':colors['background'], 
+        'color':colors['text']
+        }
     template = 'plotly_dark'
+    ####################################
+
+    # Création des graphiques Plotly
     histoPPG = px.histogram(df, 
                         x="PPG", nbins=25, 
                         labels={'PPG':'Points Per Game'},
@@ -77,47 +104,70 @@ if __name__ == '__main__':
                         opacity=0.7,
                         text_auto= True,
                         template=template)
-    
-    colors = {
-        'background': '#111111',
-        'text': '#7FDBFF'
-    }
+    ####################################
+
+    #Création du DashBoard
+    app = dash.Dash(__name__) 
 
     app.layout = html.Div(
-                        [html.H1(id = 'Title', 
-                                        children='DashBoard NBA',
-                                        style={'textAlign': 'center', 'color': colors['text']}),
-                        dcc.Tabs([
-                            dcc.Tab(label='Histogamme', style={'backgroundColor':colors['background'], 'color':colors['text']},
-                                children=[
-                                    html.H3(style={'textAlign': 'center', 'marginTop': '40px', 'color':colors['text']},
-                                            id='title histo'),
-                                    dcc.Graph(
-                                        id='graph1', style={'marginTop':'10px'}),
-
-                                    dcc.RadioItems(options={'PPG':'Points Per Game', 'APG':'Assists Per Game'},
-                                            value = 'PPG', inline=True, id='radioButton', style={'color':colors['text']})
-                                ]
-                            ),
-
-                            dcc.Tab(label='Map', style={'backgroundColor':colors['background'], 'color':colors['text']}, 
+                    style={'backgroundColor':colors['background']},
+                    children = [
+                        html.Br(), 
+                        html.H1(
+                            id = 'Title', 
+                            children='DashBoard NBA',
+                            style=H1_style),
+                        dcc.Tabs(
+                            children=[
+                                dcc.Tab(
+                                    label='Histogamme', 
+                                    style=tab_style,
                                     children=[
-                                        html.H3('Carte des 10 meillleur scoreurs NBA', 
-                                            style={'textAlign': 'center', 'color':colors['text']}),
+                                        html.H3(
+                                                style=H3_style,
+                                                id='title histo'
+                                            ),
+                                        dcc.Graph(id='graph1'),
+                                        dcc.RadioItems(
+                                            options={'PPG':'Points Per Game', 'APG':'Assists Per Game'},
+                                            value = 'PPG', 
+                                            inline=True, 
+                                            id='radioButton', 
+                                            style=radio_button_style
+                                        )
+                                    ]
+                                ),
+                                dcc.Tab(
+                                    label='Map', 
+                                    style=tab_style, 
+                                    children=[
+                                        html.H3(
+                                            children='Carte des 10 meillleur scoreurs NBA', 
+                                            style=H3_style
+                                        ),
+                                        html.Div(
+                                            style={'text-align':'center'},
+                                            children=[
+                                                html.Iframe(
+                                                    id='map', 
+                                                    srcDoc=open("map.html", 'r', encoding='UTF8').read(),
+                                                    width='80%', height=400,
+                                                    style={'textAlign': 'center', 'marginTop': '40px','marginBottom': '80px' }
+                                                )
+                                            ]
+                                        )
+                                    ]
+                                )
+                            ]
+                        ),
+                    ]
+                )
+    ####################################
 
-                                        html.Iframe(id='map', 
-                                            srcDoc=open("map.html", 'r', encoding='UTF8').read(),
-                                            width='80%', height=400,
-                                            style={'textAlign': 'center', 'marginTop': '40px', }
-                                            )]
-                            )]
-                        )
-                    ], style={'backgroundColor':colors['background'], 'background-image':colors['background']})
-
+    #Méthode des callback
     @app.callback([Output(component_id='graph1', component_property='figure'),
                     Output(component_id='title histo', component_property='children')],
                   [Input(component_id= 'radioButton', component_property='value')])
-    
     def update_histo(value):
         if value == 'PPG':
             return [histoPPG, 'Histogramme du nombre de point par match des ' 
@@ -126,5 +176,6 @@ if __name__ == '__main__':
         if value == 'APG':
             return [histoAPG,  'Histogramme du nombre d\'assists par match des ' 
                                         + str(len(df)) + ' joueur NBA']
+    ####################################
 
     app.run_server(debug=True) # (8)
