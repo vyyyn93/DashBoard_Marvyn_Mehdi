@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as bs
 import requests
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -33,12 +34,13 @@ def create_dataframe(url_site):
 
     # Récupère le texte de chaque ligne du tableau (ligne de stat) et l'ajoute dans la dataframe
     list_ligne_stat = html_data.find_all('tr', class_="full_table")
+    i = 0
     for tr_balise in list_ligne_stat:
         list_data_player = tr_balise.find_all(['th', 'td'])
         list_stat = [td_balise.text for td_balise in list_data_player] # Liste des stats
         df_length = len(dataframe)
         dataframe.loc[df_length] = list_stat # Ajouter la liste à la DataFrame à l'index 'length'
-
+        i+=1
     return dataframe
 
 def stat_to_integer(dataframe):
@@ -55,7 +57,6 @@ def stat_to_integer(dataframe):
     list_stat = df.columns.tolist()[5::]
     for i in list_stat:
         dataframe[i] = pd.to_numeric(df[i])
-
     return df
 #############################
 
@@ -66,8 +67,9 @@ if __name__ == '__main__':
     df = stat_to_integer(df)
     df["PPG"] = df["PTS"]/df["G"] # Ajoute de la colonne point par game au DataFrame
     df["APG"] = df["AST"]/df["G"]
+    df = df.round(2)
+    df = df.sort_values(by="PPG", ascending=False)
     ###########################################
-
     # Définition des styles du DashBoard
     colors = {
         'background': '#111111',
@@ -76,20 +78,24 @@ if __name__ == '__main__':
     H1_style = {
         'textAlign': 'center',
         'color': colors['text'],
-        'marginTop':'20px'
+        'marginTop':'20px',
+        'font-family' : 'Trebuchet MS, sans-serif'
     }
     H3_style = {
         'textAlign': 'center',
         'color': colors['text'],
-        'marginTop':'30px'
+        'marginTop':'30px',
+        'font-family' : 'Trebuchet MS, sans-serif'
     }
     radio_button_style = {
         'color':colors['text'],
-        'marginBottom':'50px'
+        'marginBottom':'50px',
+        'font-family' : 'Trebuchet MS, sans-serif'
     }
     tab_style={
         'backgroundColor':colors['background'],
-        'color':colors['text']
+        'color':colors['text'],
+        'font-family' : 'Trebuchet MS, sans-serif'
         }
     map_style={
         'marginBottom':'30px'
@@ -98,12 +104,34 @@ if __name__ == '__main__':
     ####################################
 
     # Création des graphiques Plotly
+    data_tab = df[['Player', 'Pos', 'PPG']][0:20].transpose().values.tolist()
+    data_tab.insert(0,[i for i in range(1, 21)])
+
+    lay=go.Layout(paper_bgcolor="#111",
+        margin={'t':0}
+    )
+
+    tableau = go.Table(
+                header=dict(values=['Rank','Player', 'Pos', 'PPG'],
+                            fill_color='paleturquoise',
+                            align='left'),
+                cells=dict(values=data_tab,
+                    fill_color='lavender',
+                    align='left')
+            )
+   
+    fig = go.Figure(data=[tableau],
+                    layout=lay
+            )
+    
+
     histoPPG = px.histogram(
         df,
         x="PPG", nbins=25,
         labels={'PPG':'Points Per Game'},
         opacity=0.7,
-        text_auto= True, template=TEMPLATE
+        text_auto= True, 
+        template=TEMPLATE
     )
 
     histoAPG = px.histogram(
@@ -166,7 +194,12 @@ if __name__ == '__main__':
                                                     srcDoc=open("map.html", 'r', encoding='UTF8').read(),
                                                     width='70%', height=500,
                                                     style=map_style
-                                                )
+                                                ),
+                                                html.H3(
+                                                    children='Tableau des 10 meilleur scoreurs NBA',
+                                                    style=H3_style
+                                                ),
+                                                dcc.Graph(id='graph2', figure=fig, style=tab_style)
                                             ]
                                         )
                                     ]
