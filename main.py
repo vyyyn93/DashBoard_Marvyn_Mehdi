@@ -9,179 +9,28 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
 from geopy.geocoders import Nominatim
-
-# Fonctions
-def create_dataframe(url_site):
-    """
-    Créer une DataFrame des statistiques des joueurs NBA.
-
-    Args:
-        url: url du site à scraper
-
-    Returns:
-        dataframe=DataFrame des statistiques des joueurs NBA
-    """
-    response = requests.get(url_site, timeout=20)
-    soup = bs(response.content, 'lxml')
-    headers = soup.find('thead') # Headers du tableau de statistique
-    html_data = soup.find("tbody") # Données à parser sur les joueurs
-
-    ## Récupère les 30 noms de chaques colonnes du tableau de statistique
-    list_headers = []
-    for th_balise in headers.find_all('th'):
-        list_headers.append(th_balise.text)
-
-    dataframe = pd.DataFrame(columns = list_headers)
-
-    # Récupère le texte de chaque ligne du tableau (ligne de stat) et l'ajoute dans la dataframe
-    list_ligne_stat = html_data.find_all('tr', class_="full_table")
-    i = 0
-    for tr_balise in list_ligne_stat:
-        list_data_player = tr_balise.find_all(['th', 'td'])
-        list_stat = [td_balise.text for td_balise in list_data_player] # Liste des stats
-        dataframe_length = len(dataframe)
-        dataframe.loc[dataframe_length] = list_stat # Ajouter la liste à la DataFrame à l'index 'length'
-        i+=1
-    return dataframe
-
-def stat_to_integer(dataframe):
-    """
-    Convertis les statistiques numérique de la dataFrame en integer.
-
-    Args:
-        dataframe: DataFrame à convertir.
-
-    Return:
-        dataframe: DataFrame convertis.
-    """
-    # Mets sous forme de list les statistiques à convertir (les 25 dernières)
-    list_stat = dataframe.columns.tolist()[5::]
-    for i in list_stat:
-        dataframe[i] = pd.to_numeric(dataframe[i])
-    return dataframe
-
-def traitement_dataFrame(dataframe):
-    """Effectue les traitements suivants:
-        Ajout de la colonne PPG  
-
-        Ajoute de la colonne APP
-
-        Arrondis les valeurs à 2 chiffres significatifs
-
-        Trie les jouers par ordre croissant de PPG
-    
-    Args: dataFrame des joueurs NBA
-    
-    Return: Data frame fonctionnelle"""
-    dataframe["PPG"] = dataframe["PTS"]/dataframe["G"] # Ajoute de la colonne point par game au DataFrame
-    dataframe["APG"] = dataframe["AST"]/dataframe["G"]
-    dataframe = dataframe.round(2)
-    dataframe = dataframe.sort_values(by="PPG", ascending=False)
-    return dataframe
-
-def create_dico_coord():
-    """
-    Crée un dictionnaire des stades des équpes avec les coordonnées GPS associées
-    
-    Args:
-        None
-    
-    Returns:
-        dicoTeamCoord: dictionnaire des stades et leurs coordonnées GPS"""
-        
-    dicoTeamStade = {"BRK":"Barclays Center", "BOS":"TD Garden", 
-            "DAL":"American Airlines Center", "OKC":"Paycom Center", 
-            "PHO": "Footprint Center", "GSW": "Chase Center",
-            "CLE":"Rocket Mortgage Fieldhouse", "MIL":"Fiserv Forum", 
-            "ATL":"State Farm Arena", "CHI":"United Center",
-            "LAL":"Crypto.com Arena", "MIN":"Target Center",
-            "POR":"Moda Center", "NYK":"Madison Square Garden",
-            "HOU":"Toyota Center", "DET":"Little Caesars Arena",
-            "WAS":"Capital One Arena","DEN":"Ball Arena",
-            "CHO":"Charlotte", "PHI":"Wells Fargo Center", 
-            "MIA":"FTX Arena", "SAC":"Golden 1 Center", 
-            "ORL":"Amway Center", "MEM":"Memphis", 
-            "TOR":"Toronto", "SAS":"San Antonio", 
-            "NOP":"New Orlean", "IND":"Indianapolis", 
-            "LAC":"Los Angeles", 'UTA':"Vivint Arena"}
-
-    loc = Nominatim(user_agent="GetLoc")
-
-    dicoTeamCoord = {}
-    for team in dicoTeamStade.keys():
-        getLocTeam = loc.geocode(dicoTeamStade[team])
-        dicoTeamCoord[team]= [getLocTeam.latitude , getLocTeam.longitude]
-    
-    return dicoTeamCoord
-#############################
+import style
+import create_dataFrame as cdf
 
 if __name__ == '__main__':
-    #Scraping du site et création de la dataFrame
-    URL = "https://www.basketball-reference.com/leagues/NBA_2023_totals.html#totals_stats::pts"
-    dataframe = create_dataframe(URL)
-    dataframe = stat_to_integer(dataframe)
-    dataframe = traitement_dataFrame(dataframe)
-    ###########################################
-    # Définition des styles du DashBoard
-    colors = {
-        'background': '#151516',
-        'text': '#0079D2'
-    }
-    H1_style = {
-        'textAlign': 'center',
-        'color': colors['text'],
-        'marginTop':'20px',
-        'marginBottom':'20px',
-        'font-family' : 'Trebuchet MS, sans-serif'
-    }
-    H3_style = {
-        'textAlign': 'center',
-        'color': colors['text'],
-        'marginTop':'30px',
-        'font-family' : 'Trebuchet MS, sans-serif'
-    }
-    radio_button_style = {
-        'color':'#FFFFFF',
-        'font-family' : 'Trebuchet MS, sans-serif',
-        'fontSize' : '20px',
-        'padding':'30px'
-    }
-    tab_style={
-        'backgroundColor':colors['background'],
-        'color':colors['text'],
-        'font-family' : 'Trebuchet MS, sans-serif',
-        'text-align':'center',
-        'border-radius': '4px'
-        }
-    tab_selected_style={
-    "background": "black",
-    'color': colors['text'],
-    'font-family' : 'Trebuchet MS, sans-serif',
-    'text-align':'center',
-    'align-items': 'center',
-    'justify-content': 'center',
-    'border-radius': '4px',
-    }
-    map_style={
-        'marginBottom':'30px'
-    }
-    histo_style ={
-        'width':'1000px', 
-        "display": "block",
-        "margin-left": "auto",
-        "margin-right": "auto"
-    }
-    TEMPLATE = 'plotly_dark'
-    ####################################
-    # Création des graphiques Plotly
+    #region Création de la dataFrame
+    dataframe = cdf.create_dataframe(cdf.URL)
+    dataframe = cdf.stat_to_integer(dataframe)
+    dataframe = cdf.traitement_dataFrame(dataframe)
+    #endregion
+
+    #region Création des graphiques Plotly
     data_tab = dataframe[['Player', 'Pos', 'PPG']][0:20].transpose().values.tolist()
     data_tab.insert(0,[i for i in range(1, 21)])
 
-    lay=go.Layout(paper_bgcolor=colors['background'],
-        margin={'t':0}
+    lay=go.Layout(
+            paper_bgcolor=style.colors['background'],
+            margin={'t':0},
+            title="titre"
     )
 
     tableau = go.Table(
+
                 header=dict(values=['Rank','Player', 'Pos', 'PPG'],
                             fill_color='paleturquoise',
                             align='left'),
@@ -200,9 +49,10 @@ if __name__ == '__main__':
         labels={'PPG':'Points Per Game'},
         opacity=0.7,
         text_auto= True, 
-        template=TEMPLATE,
+        template=style.TEMPLATE,
         title = "Histogramme du nombre de point par match des "
                 + str(len(dataframe)) + " joueur NBA"
+        
     )
 
     histoAPG = px.histogram(
@@ -211,11 +61,26 @@ if __name__ == '__main__':
         labels={'APG':'Assists Per Game'},
         opacity=0.7,
         text_auto= True,
-        template=TEMPLATE,
+        template=style.TEMPLATE,
         title = 'Histogramme du nombre de passe par match des '
                                         + str(len(dataframe)) + ' joueur NBA'
     )
+    #endregion
     
+    #region Création des composants du DashBoard
+    space = html.Br()
+    
+    title = html.H1(
+                id = 'Title',
+                children='DashBoard NBA',
+                style=style.H1_style
+            )
+    
+    histo = dcc.Graph(
+                id='graph1', 
+                style=style.histo_style
+            )
+
     radioItem = dcc.RadioItems(
                     options={
                         'PPG':'Points Per Game',
@@ -223,63 +88,71 @@ if __name__ == '__main__':
                     },
                     value = 'PPG',
                     inline=True,
-                    labelStyle=radio_button_style,
+                    labelStyle=style.radio_button_style,
                     id='radioButton'
                 )
-    ####################################
+    
+    titreMap = html.H3(
+                    children='Carte des 10 meillleur scoreurs NBA',
+                    style=style.H3_style
+                )
+    
+    map = html.Iframe(
+                id='map',
+                srcDoc=open("map.html", 'r', encoding='UTF8').read(),
+                width='70%', height=500,
+                style=style.map_style
+            )
+    
+    titreTable = html.H3(
+                        children='Tableau des 10 meilleur scoreurs NBA',
+                        style=style.H3_style
+                    )
 
-    #Création du DashBoard
+    table = dcc.Graph(
+                id='graph2', 
+                figure=fig, 
+                style=style.tab_style
+            )
+    #endregion
+    
+    #region Création du DashBoard
     app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
     app.layout = html.Div(
-                    style={'backgroundColor':colors['background']},
+                    style=style.div_style,
                     children = [
-                        html.Br(),
-                        html.H1(
-                            id = 'Title',
-                            children='DashBoard NBA',
-                            style=H1_style),
+                        space,
+                        title,
                         dcc.Tabs(
                             children=[
                                 dcc.Tab(
                                     label='Histogamme',
-                                    style=tab_style,
-                                    selected_style=tab_selected_style,
+                                    style=style.tab_style,
+                                    selected_style=style.tab_selected_style,
                                     children=[
-                                        html.Br(),
-                                        dcc.Graph(id='graph1', 
-                                        style=histo_style),
-                                        html.Br(),
+                                        space,
+                                        histo,
+                                        space,
                                         html.Div(
                                             radioItem,
-                                            style =  {'text-align':'center','display': 'block'},
+                                            style = style.div_style,
                                             className = "fs-5"),
                                         html.Br()
                                     ]
                                 ),
                                 dcc.Tab(
                                     label='Map',
-                                    style=tab_style,
-                                    selected_style=tab_selected_style, 
+                                    style=style.tab_style,
+                                    selected_style=style.tab_selected_style, 
                                     children=[
-                                        html.H3(
-                                            children='Carte des 10 meillleur scoreurs NBA',
-                                            style=H3_style
-                                        ),
+                                        titreMap,
                                         html.Div(
                                             style={'text-align':'center'},
                                             children=[
-                                                html.Iframe(
-                                                    id='map',
-                                                    srcDoc=open("map.html", 'r', encoding='UTF8').read(),
-                                                    width='70%', height=500,
-                                                    style=map_style
-                                                ),
-                                                html.H3(
-                                                    children='Tableau des 10 meilleur scoreurs NBA',
-                                                    style=H3_style
-                                                ),
-                                                dcc.Graph(id='graph2', figure=fig, style=tab_style)
+                                                map,
+                                                titreTable,
+                                                table
                                             ]
                                         )
                                     ]
@@ -288,9 +161,9 @@ if __name__ == '__main__':
                         ),
                     ]
                 )
-    ####################################
+    #endregion
 
-    #Méthode des callback
+    #region Méthode des callback
     @app.callback(Output(component_id='graph1', component_property='figure'),
                   [Input(component_id= 'radioButton', component_property='value')])
 
@@ -307,6 +180,6 @@ if __name__ == '__main__':
             return histoPPG
 
         return histoAPG
-    ####################################
+    #endregion
 
     app.run_server(debug=True) # (8)
