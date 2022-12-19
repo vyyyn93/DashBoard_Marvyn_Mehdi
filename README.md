@@ -51,7 +51,7 @@ Le projet est divisé en plusieurs fichiers.
 * style.py regroupe les styles CSS des composants du DashBoard. Ces styles sont initialisés sous forme de disctionnaire et importé dans le programme principale main.py
 
 La structure du programme peut-être résumé avec le graphique suivant:
-[![](https://mermaid.ink/img/pako:eNplj8EKgzAMhl-l5ORAfYAedpLddtqOhRHaOAVbpaYHEd99qc7DWA4hJN__k38FOzoCDe-IU6eejQlKys5zMfMyUD0tF1VVV-WxD0VueXNAri1sJGR6OWS8RfS_-NcKI5Mop7pjP_xd5XC6ZObU7yoToARPUXAnL65ZYoA78mRAy-ioxTSwARM2QTHx-FiCBc0xUQlpkseo6VHCedAtDrNsyfU8xvsRe0-_fQArIlWp?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNplj8EKgzAMhl-l5ORAfYAedpLddtqOhRHaOAVbpaYHEd99qc7DWA4hJN__k38FOzoCDe-IU6eejQlKys5zMfMyUD0tF1VVV-WxD0VueXNAri1sJGR6OWS8RfS_-NcKI5Mop7pjP_xd5XC6ZObU7yoToARPUXAnL65ZYoA78mRAy-ioxTSwARM2QTHx-FiCBc0xUQlpkseo6VHCedAtDrNsyfU8xvsRe0-_fQArIlWp)
+[![](https://mermaid.ink/img/pako:eNpNUDEOgzAM_ErkiUq0D2DoUtStEx0jVVZiChIJKJgB0T6o7-jH6gBFZLByzt3ZuQlMawkyeAbsKnXPtVdyTN8nPY8NnbrxoI7Hs3rNUF2K4uWw9kks8XHh2zIxgZDpYZHxGtDtlFtrVq4DMDCJSXeq2DUrUeCeIvDvGombnwnfD3LdehUFs5P2kIKjIGorn5migwauyJGGTK6WShwa1qD9W6g4cFuM3kDGYaAUhk6WpLxGicFBVmLTS5dszW24LQHNOb1_r9JnQA?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNpNUDEOgzAM_ErkiUq0D2DoUtStEx0jVVZiChIJKJgB0T6o7-jH6gBFZLByzt3ZuQlMawkyeAbsKnXPtVdyTN8nPY8NnbrxoI7Hs3rNUF2K4uWw9kks8XHh2zIxgZDpYZHxGtDtlFtrVq4DMDCJSXeq2DUrUeCeIvDvGombnwnfD3LdehUFs5P2kIKjIGorn5migwauyJGGTK6WShwa1qD9W6g4cFuM3kDGYaAUhk6WpLxGicFBVmLTS5dszW24LQHNOb1_r9JnQA)
 
 
 ### Le programme principale main.py
