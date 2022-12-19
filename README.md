@@ -40,3 +40,10 @@ La map nous montre en repartition homogène des meilleurs joueurs. En effet, les
 Cela montre un niveau homogène entre ces deux conférences, ce qui n'était pas aussi juste quelques années auparavent où la conférence Ouest regroupait plus de stars et où le niveau y  était bien plus relevé.
   
 ## Developper Guide
+Le programme principale peut se diviser en partie distincte:
+* Définition des fonctions
+* Récupération des données et création de la DataFrame
+* Nettoyage des données
+* Initialisation des style CSS du DashBoard
+* Création des graphiques plotly des des composents Dash
+* Création du DashBoars
