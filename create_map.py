@@ -108,6 +108,7 @@ for joueur in df[0:10].itertuples():
     i+=1
 
     label = folium.Html("<p>" +str(i)+ ". " +joueur.Player + "<br />" +
+                        joueur.Tm + "<br />" +
                         str(joueur.PPG)[0:4] + " PPG <br/></p>",
                         script=True)
     pop = folium.Popup(label, max_width=500)

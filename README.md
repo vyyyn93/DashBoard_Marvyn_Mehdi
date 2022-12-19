@@ -6,7 +6,7 @@ Les données des joueurs ont été récupérer sur le site  [basketball referenc
 Pour chaque joueur, 30 données statistiques différentes par joueurs sont disponibles sur le site. Par exemple, nous avons acc_s à leur poste, leur équipe, le nombre de points marqué, le nombre de passe, leur pourcentage de reussite et leur nombre de match joué.
 
 ## User Guide
-### Istallation des modules et du dépôt GIT
+### Installation des modules et du dépôt GIT
 Pour utiliser le DashBoard sur votre machine, vous devez tout d'abord vous assurer d'avoir correctement installer Git. Pour installer les packages nécessaire à la bonne excecution du code, entrer la commande suivante dans un terminal:
 ``` 
 $ python -m pip install -r requirements.txt

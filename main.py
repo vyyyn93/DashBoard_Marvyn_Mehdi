@@ -8,7 +8,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
-import webbrowser
+from geopy.geocoders import Nominatim
 
 # Fonctions
 def create_dataframe(url_site):
@@ -78,6 +78,41 @@ def traitement_dataFrame(dataframe):
     dataframe = dataframe.round(2)
     dataframe = dataframe.sort_values(by="PPG", ascending=False)
     return dataframe
+
+def create_dico_coord():
+    """
+    Crée un dictionnaire des stades des équpes avec les coordonnées GPS associées
+    
+    Args:
+        None
+    
+    Returns:
+        dicoTeamCoord: dictionnaire des stades et leurs coordonnées GPS"""
+        
+    dicoTeamStade = {"BRK":"Barclays Center", "BOS":"TD Garden", 
+            "DAL":"American Airlines Center", "OKC":"Paycom Center", 
+            "PHO": "Footprint Center", "GSW": "Chase Center",
+            "CLE":"Rocket Mortgage Fieldhouse", "MIL":"Fiserv Forum", 
+            "ATL":"State Farm Arena", "CHI":"United Center",
+            "LAL":"Crypto.com Arena", "MIN":"Target Center",
+            "POR":"Moda Center", "NYK":"Madison Square Garden",
+            "HOU":"Toyota Center", "DET":"Little Caesars Arena",
+            "WAS":"Capital One Arena","DEN":"Ball Arena",
+            "CHO":"Charlotte", "PHI":"Wells Fargo Center", 
+            "MIA":"FTX Arena", "SAC":"Golden 1 Center", 
+            "ORL":"Amway Center", "MEM":"Memphis", 
+            "TOR":"Toronto", "SAS":"San Antonio", 
+            "NOP":"New Orlean", "IND":"Indianapolis", 
+            "LAC":"Los Angeles", 'UTA':"Vivint Arena"}
+
+    loc = Nominatim(user_agent="GetLoc")
+
+    dicoTeamCoord = {}
+    for team in dicoTeamStade.keys():
+        getLocTeam = loc.geocode(dicoTeamStade[team])
+        dicoTeamCoord[team]= [getLocTeam.latitude , getLocTeam.longitude]
+    
+    return dicoTeamCoord
 #############################
 
 if __name__ == '__main__':
