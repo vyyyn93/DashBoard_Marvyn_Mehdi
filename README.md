@@ -47,3 +47,11 @@ Le programme principale peut se diviser en partie distincte:
 * Initialisation des style CSS du DashBoard
 * Création des graphiques plotly des des composents Dash
 * Création du DashBoars
+
+La création de la map utilise le module Nominatim. Le programme est disponible dans le fichier create_map.py. Neanmoins, le programme ne marche à chaque fois pour une raison inconnue. La map est donc déjà construite dans le fichier map.html et est utilisé dans le DashBoadrd. 
+Vous pouvez lancer le programme avec la commande suivant:
+```
+$ python create_map.py
+```
+Si le programme fonctionne, la map crée ecrasera la map actuel et sera utilisé dans le DashBoard.
+
