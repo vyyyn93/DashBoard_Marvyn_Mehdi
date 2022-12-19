@@ -56,13 +56,13 @@ La structure du programme peut-être résumé avec le graphique suivant:
 
 
 ### Le programme principale main.py
-Le programme principale peut se diviser en partie distincte:
-* Définition des fonctions
-* Récupération des données et création de la DataFrame
-* Nettoyage des données
-* Initialisation des style CSS du DashBoard
-* Création des graphiques plotly des des composents Dash
-* Création du DashBoars
+Le programme principale peut se diviser en parties distinctes. N'hésitez pas à utiliser les régions implémenté au début de chaque section dans le fichier pour faciliter la lecture du code:
+
+* Scrapping et création de la dataFrame: Le programme utiliser les fonctions *create_dataframe*, *stat_to_integer* et *traitement_dataFrame* pour respectivement scrapping le site et crée la dataFrame, convertir les statistiques qui represente des chiffres en integer et nettoyer les données de la dataFrame.
+* Création des graphiques plotly: ici  nous initialisons les graphiques utilisés dans le dashBoard (le tableau et les deux histogrammes).
+* Création des composants Dash: Cette section initialise les composants relatif à la bibliothèque Dash (titres, radioItem, map, graph).
+* Création du DashBoard: Nous créeons ici le DashBoard en implémentant dans le bon ordre les composants dans des conteneurs Div et Tabs.
+* Définition des méthodes de callback
 
 La création de la map utilise le module Nominatim. Le programme est disponible dans le fichier create_map.py. Neanmoins, le programme ne marche à chaque fois pour une raison inconnue. La map est donc déjà construite dans le fichier map.html et est utilisé dans le DashBoadrd. 
 Vous pouvez lancer le programme avec la commande suivant:
