@@ -4,7 +4,6 @@ import pandas as pd
 from geopy.geocoders import Nominatim
 import folium
 import webbrowser
-import branca
 
 #Fonctions
 def create_soup(url):

@@ -15,7 +15,7 @@ $ python -m pip install -r requirements.txt
 Pour cloner le depôt sur votre machine, entrez la commande suivante dans un terminal:
 ```
 $ cd Votre_Repertoire_De_Travail
-$ git clone adresse_publique_de_votre_projet
+$ git clone https://github.com/vyyyn93/DashBoard_Marvyn_Mehdi.git
 ```
 
 Pour lancer le scrapping des données et créer le DashBoard, excecutez cette commande dans le terminal.
