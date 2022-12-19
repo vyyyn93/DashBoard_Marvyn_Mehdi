@@ -40,6 +40,23 @@ La map nous montre en repartition homogène des meilleurs joueurs. En effet, les
 Cela montre un niveau homogène entre ces deux conférences, ce qui n'était pas aussi juste quelques années auparavent où la conférence Ouest regroupait plus de stars et où le niveau y  était bien plus relevé.
   
 ## Developper Guide
+### Structure du projet
+Le projet est divisé en plusieurs fichiers.
+* create_dataFrame regroupe les fonctions de scrapping, l'url du site, la création et le traitement de la dataFrame. Les fonctions sont utilisés au début du fichier main.py
+* create_map.py contient les fonctions et le coe liés à la création de la map des meilleurs scoreurs NBA.
+* main.py contient le programme principal. Il initialise les composants, scrap le site, crée la dataFrame et le DashBoard.
+* map.html est le fichier de la map affiché sur le DashBoard.
+* README.md est le fichier de présentation du projet que vous êtes actuellement en train de lire.
+* requirmeents.txt contient le nom des modules et leurs versions nécessaire au bon fonctionnement du projet.
+* style.py regroupe les styles CSS des composants du DashBoard. Ces styles sont initialisés sous forme de disctionnaire et importé dans le programme principale main.py
+
+graph TD
+    css(style.py) --> main(main.py)
+    df(create_dataFrame.py) --> main
+    carte(map.html) --> main
+    cmap(create_map.py) --> carte
+
+### Le programme principale main.py
 Le programme principale peut se diviser en partie distincte:
 * Définition des fonctions
 * Récupération des données et création de la DataFrame
