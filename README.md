@@ -40,13 +40,29 @@ La map nous montre en repartition homogène des meilleurs joueurs. En effet, les
 Cela montre un niveau homogène entre ces deux conférences, ce qui n'était pas aussi juste quelques années auparavent où la conférence Ouest regroupait plus de stars et où le niveau y  était bien plus relevé.
   
 ## Developper Guide
-Le programme principale peut se diviser en partie distincte:
-* Définition des fonctions
-* Récupération des données et création de la DataFrame
-* Nettoyage des données
-* Initialisation des style CSS du DashBoard
-* Création des graphiques plotly des des composents Dash
-* Création du DashBoars
+### Structure du projet
+Le projet est divisé en plusieurs fichiers.
+* **create_dataFrame.py** regroupe les fonctions de scrapping, l'url du site, la création et le traitement de la dataFrame. Les fonctions sont utilisés au début du fichier main.py
+* **create_map.py** contient les fonctions et le coe liés à la création de la map des meilleurs scoreurs NBA.
+* **main.py contient** le programme principal. Il initialise les composants, scrap le site, crée la dataFrame et le DashBoard.
+* **map.html** est le fichier de la map affiché sur le DashBoard.
+* **README.md** est le fichier de présentation du projet que vous êtes actuellement en train de lire.
+* **requirmeents.txt** contient le nom des modules et leurs versions nécessaire au bon fonctionnement du projet.
+* **style.py regroupe** les styles CSS des composants du DashBoard. Ces styles sont initialisés sous forme de disctionnaire et importé dans le programme principale main.py
+
+La structure du programme peut-être résumé avec le graphique suivant:  
+
+[![](https://mermaid.ink/img/pako:eNpNUDEOgzAM_ErkiUq0D2DoUtStEx0jVVZiChIJKJgB0T6o7-jH6gBFZLByzt3ZuQlMawkyeAbsKnXPtVdyTN8nPY8NnbrxoI7Hs3rNUF2K4uWw9kks8XHh2zIxgZDpYZHxGtDtlFtrVq4DMDCJSXeq2DUrUeCeIvDvGombnwnfD3LdehUFs5P2kIKjIGorn5migwauyJGGTK6WShwa1qD9W6g4cFuM3kDGYaAUhk6WpLxGicFBVmLTS5dszW24LQHNOb1_r9JnQA?type=png)](https://mermaid-js.github.io/mermaid-live-editor/edit#pako:eNpNUDEOgzAM_ErkiUq0D2DoUtStEx0jVVZiChIJKJgB0T6o7-jH6gBFZLByzt3ZuQlMawkyeAbsKnXPtVdyTN8nPY8NnbrxoI7Hs3rNUF2K4uWw9kks8XHh2zIxgZDpYZHxGtDtlFtrVq4DMDCJSXeq2DUrUeCeIvDvGombnwnfD3LdehUFs5P2kIKjIGorn5migwauyJGGTK6WShwa1qD9W6g4cFuM3kDGYaAUhk6WpLxGicFBVmLTS5dszW24LQHNOb1_r9JnQA)
+
+
+### Le programme principale main.py
+Le programme principale peut se diviser en parties distinctes. N'hésitez pas à utiliser les régions implémenté au début de chaque section dans le fichier pour faciliter la lecture du code:
+
+* Scrapping et création de la dataFrame: Le programme utiliser les fonctions *create_dataframe*, *stat_to_integer* et *traitement_dataFrame* pour respectivement scrapping le site et crée la dataFrame, convertir les statistiques qui represente des chiffres en integer et nettoyer les données de la dataFrame.
+* Création des graphiques plotly: ici  nous initialisons les graphiques utilisés dans le dashBoard (le tableau et les deux histogrammes).
+* Création des composants Dash: Cette section initialise les composants relatif à la bibliothèque Dash (titres, radioItem, map, graph).
+* Création du DashBoard: Nous créeons ici le DashBoard en implémentant dans le bon ordre les composants dans des conteneurs Div et Tabs.
+* Définition des méthodes de callback
 
 La création de la map utilise le module Nominatim. Le programme est disponible dans le fichier create_map.py. Neanmoins, le programme ne marche à chaque fois pour une raison inconnue. La map est donc déjà construite dans le fichier map.html et est utilisé dans le DashBoadrd. 
 Vous pouvez lancer le programme avec la commande suivant:
@@ -54,4 +70,6 @@ Vous pouvez lancer le programme avec la commande suivant:
 $ python create_map.py
 ```
 Si le programme fonctionne, la map crée ecrasera la map actuel et sera utilisé dans le DashBoard.
+
+## Problème rencontré
 
