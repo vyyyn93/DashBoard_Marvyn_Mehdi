@@ -1,9 +1,5 @@
-import requests
-from bs4 import BeautifulSoup as bs
-import pandas as pd 
 from geopy.geocoders import Nominatim
 import folium
-import webbrowser
 import create_dataFrame as cdf
 
 def create_dico_coord():
