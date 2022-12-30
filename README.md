@@ -18,7 +18,7 @@ $ cd Votre_Repertoire_De_Travail
 $ git clone https://github.com/vyyyn93/DashBoard_Marvyn_Mehdi.git
 ```
 Le projet utilise les modules suivants:
-beautifulsoup4==4.11.1
+* beautifulsoup4==4.11.1
 * dash==2.7.0
 * nominatim==0.1
 * requests==2.28.1
