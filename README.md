@@ -91,5 +91,5 @@ Vous pouvez lancer le programme avec la commande suivant:
 ```
 $ python create_map.py
 ```
-Si le programme fonctionne, la map créée ecrasera la map actuelle et sera utilisé dans le DashBoard.
+Si le programme fonctionne, la map créée écrasera la map actuelle et sera utilisée dans le DashBoard.
 
