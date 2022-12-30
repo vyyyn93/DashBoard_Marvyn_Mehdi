@@ -29,9 +29,10 @@ Le projet utilise les modules suivants:
 * dash-html-components==2.0.0
 * dash-table==5.0.0
 
-Pour installer ces modules, rendez vous dans le repertoire où vous avez initaliser le dépôt GIT et entrez la commande suivante dans un terminal:
+Pour installer ces modules, rendez vous dans le repertoire où vous avez initaliser le dépôt GIT et entrez successivement les commandes suivantes dans votre terminal:
 
 ``` 
+$ cd DashBoard_Marvyn_Mehdi
 $ python -m pip install -r requirements.txt
 ```
 
